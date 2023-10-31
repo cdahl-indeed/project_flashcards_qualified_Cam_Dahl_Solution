@@ -9,5 +9,20 @@
 .breadcrumb li:not(:last-child)::after {
     display: inline-block;
     margin: 0 .25rem;
-    content: "/";
+}
+
+.container {
+    align-items: center;
+}
+
+.header {
+    display: inline;
+}
+
+.cardFront {
+    display: inline;
+}
+
+.cardBack {
+    display: inline;
 }

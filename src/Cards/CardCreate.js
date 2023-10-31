@@ -1,18 +1,21 @@
 import React, {useEffect, useState} from "react";
-import {useHistory, useParams, useRouteMatch} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {createCard, readDeck} from "../utils/api";
 
 // /decks/:deckId/cards/new
 function CardCreate(){
     const [deck, setDeck] = useState([]);
-    //const [lastCard, setLastCard] = useState('');
-    //const [newCardID, setNewCardID] = useState(1);
     const signal = new AbortController().signal;
-//gets current id of the last cards and then adds 1
-    // get cards.length (props.cards.length -1)[to get to array spot] query at location .id +1
-
     const {deckId} = useParams();
-    console.log('deck id: ',deckId)
+
+    //icons
+    const homeIcon = (
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+             className="bi bi-house-door-fill" viewBox="0 0 16 16">
+            <path
+                d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5Z"/>
+        </svg>
+    );
 
     let initialFormState = {
         front: '',
@@ -25,7 +28,6 @@ function CardCreate(){
             await readDeck(deckId, signal).then((deckCall) => {
                 // Log the fetched data
                 console.log('Fetched card Create deck: ', deckCall);
-                //console.log('Fetched decks Cards Specifics: ', decksCall[0].cards);
 
                 //Set the decks in the use State
                 setDeck(deckCall);
@@ -34,26 +36,19 @@ function CardCreate(){
         }
         loadDecksFromAPI().then(() => console.log('loaded Decks From API'));
 
-    }, []);
+    }, [deckId]);
 
     const DeckNav = () => (
         <nav aria-label="Breadcrumb" className="breadcrumb">
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href={"/decks/" + deckId}> {deck.name}</a></li>
-                <li><span aria-current="page">Add Card </span></li>
+                <li className="breadcrumb-item"><Link to="/">{homeIcon} Home</Link></li>
+                <li className="breadcrumb-item"><Link to={"/decks/" + deckId}> {deck.name}</Link></li>
+                <li className="breadcrumb-item active"><span aria-current="page">Add Card </span></li>
             </ul>
         </nav>
     );
 
     const [formData, setFormData] = useState(initialFormState);
-    const history = useHistory();
-
-    const {url} = useRouteMatch();
-
-    console.log('CardCreate url: ', url);
-
-
 
     const handleCardChange = (event) => {
         const { name, value } = event.target;
@@ -75,8 +70,7 @@ function CardCreate(){
         try {
             // Pass the form data as arguments to the createCard function
             await createCard(parseInt(deckId), card, signal);
-            history.push(`/decks/${deckId}`);
-            window.location.reload();
+            window.location.href=`/decks/${deckId}`
         } catch (error) {
             console.log('formData from Create: ', formData);
             console.error("Error creating card:", error);
@@ -88,44 +82,45 @@ function CardCreate(){
 
     if(deck && deck.name){
         return (
-            <form name='createCardForm' onSubmit={handleSubmit}>
-                <DeckNav></DeckNav>
-                <h1>{deck.name}: Add Card</h1>
-                <br/>
-                <h3>Front: </h3>
-                <textarea name='front'
-                          id="cardFrontEdit"
-                          required={true}
-                          rows={3}
-                          cols="75"
-                          onChange={handleCardChange}
-                          placeholder={'Front side of card'}>
+            <div className="container">
+                <form name='createCardForm' onSubmit={handleSubmit}>
+                    <DeckNav></DeckNav>
+                    <h1>{deck.name}: Add Card</h1>
+                    <br/>
+                    <h3>Front: </h3>
+                    <textarea name='front'
+                              id="cardFrontEdit"
+                              required={true}
+                              rows={3}
+                              cols="75"
+                              onChange={handleCardChange}
+                              placeholder={'Front side of card'}>
+                    </textarea>
 
-            </textarea>
-                <br/>
-                <h3>Back: </h3>
-                <textarea name='back'
-                          id="cardBackEdit"
-                          required={true}
-                          rows={3}
-                          cols="75"
-                          onChange={handleCardChange}
-                          placeholder={'Back side of card'}>
-
-            </textarea>
-                <br/>
-                <button
-                    className='cancel btn-secondary btn-lg'
-                    onClick={() => history.push('/')}>
-                    Cancel
-                </button>
-                <button
-                    className='submit btn-primary btn-lg'
-                    type='submit'
-                >
-                    Submit
-                </button>
-            </form>
+                    <br/>
+                    <h3>Back: </h3>
+                    <textarea name='back'
+                              id="cardBackEdit"
+                              required={true}
+                              rows={3}
+                              cols="75"
+                              onChange={handleCardChange}
+                              placeholder={'Back side of card'}>
+                    </textarea>
+                    <br/>
+                    <button
+                        className='cancel btn-secondary btn-lg'
+                        onClick={() => window.location.href=`/`}>
+                        Cancel
+                    </button>
+                    <button
+                        className='submit btn-primary btn-lg ml-2'
+                        type='submit'
+                    >
+                        Submit
+                    </button>
+                </form>
+            </div>
         )
     } else {
         return <p>Error Loading Add Card</p>

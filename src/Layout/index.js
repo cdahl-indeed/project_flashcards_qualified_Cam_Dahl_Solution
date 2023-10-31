@@ -3,64 +3,59 @@ import Header from "./Header";
 import NotFound from "./NotFound";
 import {listDecks} from "../utils/api";
 import DeckCardHome from "../Decks/DeckCardHome";
-import {Switch, Route, useHistory, useRouteMatch} from "react-router-dom";
-import DeckNav from "./DeckNav";
+import {Switch, Route} from "react-router-dom";
 import DeckCreate from "../Decks/DeckCreate";
 import DeckView from "../Decks/DeckView";
 import CardCreate from "../Cards/CardCreate";
 import CardEdit from "../Cards/CardEdit";
 import DeckEdit from "../Decks/DeckEdit";
 import DeckStudy from "../Decks/DeckStudy";
-import Breadcrumbs from './DeckNav';
-
-
 
 function Layout() {
  const [decks, setDecks] = useState([]);
  const [deckSize, setDeckSize] = useState(0);
- const history = useHistory();
- const {url} = useRouteMatch();
+
+    //icons
+    const plusIcon = (
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-plus"
+             viewBox="0 0 16 16">
+            <path
+                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+    );
 
 
     useEffect(() =>{
         const signal = new AbortController().signal;
         async function loadDecksFromAPI() {
             await listDecks(signal).then((decksCall) => {
-                // Log the fetched data
-                // console.log('Fetched decks: ', decksCall);
-                // console.log('Fetched decks Cards Specifics: ', decksCall[0].cards);
-
                 //Set the decks in the use State
                 setDecks(decksCall);
                 //Sets the size of returned decks so when you create one it has +1 size
                 setDeckSize(decksCall.length)
-
             });
         }
-
             loadDecksFromAPI().then(() => console.log('loaded Decks From API'));
-
     },[]);
 
-console.log('Decks from UseState: ', decks);
-
-
   return (
-        <Fragment className="container">
+        <Fragment>
             <Header />
             <Switch>
                 <Route exact path="/" >
                     {/* TODO: Implement the screen starting here */}
-
-                    <button className='deckStudy btn btn-secondary btn-lg'
-                            type="button"
-                            onClick={() => {
-                                history.push(`/decks/new`);
-                            }
-                            }>
-                        + Create Deck
-                    </button>
-
+                    <div className="container">
+                        <button className='deckStudy btn-secondary btn-lg mx-auto'
+                                type="button"
+                                onClick={() => {
+                                    window.location.href=`/decks/new`;
+                                }
+                                }>
+                            {plusIcon} Create Deck
+                        </button>
+                        <br />
+                        <br />
+                    </div>
 
                     {(decks.length > 0) ?
                         <DeckCardHome decks={decks} ></DeckCardHome>
